@@ -1,6 +1,6 @@
 # clickonce
 
-A new Flutter project.
+Click once app for sale man which help salesman to make invoice or clollect cash,  expenses , can sea cash statmen in report , know statmen of custmer to collect monye , make deal with new customer and add new customer in app which all thae data is part of ERP cloud Click once connect by API.
 
 ## Getting Started
 ![CHESES!](image_project/face_project.jpg)
