@@ -1,0 +1,199 @@
+import 'dart:io';
+
+import 'package:clickonce/models/fav_model.dart';
+import 'package:clickonce/modules/cubit_main/states.dart';
+import 'package:clickonce/modules/invoice_screen/Order.dart';
+import 'package:clickonce/modules/invoice_screen/Order.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get_rx/src/rx_types/rx_types.dart';
+import 'package:path_provider/path_provider.dart';
+// import 'package:pdf/pdf.dart';
+import 'package:syncfusion_flutter_pdf/pdf.dart';
+
+import '../../models/items_model.dart';
+import '../../shared/network/remote/dio_helper.dart';
+import '../../shared/network/remote/end_point.dart';
+import '../cubit_main/cubit.dart';
+
+class PdfApi {
+  static Future<File> generatePDF({
+    // required Order order,
+    // required List<dynamic>lsxx,
+    required ByteData imageSignature,
+  }) async {
+    final document = PdfDocument();
+    final page = document.pages.add();
+    drawGrid(page);
+    drawSignature(page, imageSignature);
+
+    return saveFile(document);
+  }
+
+  static Future<File> saveFile(PdfDocument document) async {
+    final path = await getApplicationSupportDirectory();
+    final fileName = path.path + '/Invoices${DateTime.now()}.pdf';
+    final file = File(fileName);
+    file.writeAsBytes(document.saveSync());
+    document.dispose();
+    return file;
+  }
+
+  static void drawSignature(PdfPage page, ByteData imageSignature) {
+    final pageSize = page.getClientSize();
+    final PdfBitmap image = PdfBitmap(imageSignature.buffer.asUint8List());
+    final signatureText = '''
+     Total:1000
+     
+
+                     ''';
+    page.graphics.drawString(
+      signatureText,
+      PdfStandardFont(PdfFontFamily.helvetica, 12),
+      format: PdfStringFormat(
+        alignment: PdfTextAlignment.left,
+      ),
+      bounds: Rect.fromLTWH(pageSize.width - 200, pageSize.height - 200, 0, 0),
+    );
+    page.graphics.drawImage(image,
+        Rect.fromLTWH(pageSize.width - 120, pageSize.height - 200, 100, 40));
+  }
+
+  static void drawGrid(PdfPage page) {
+    final grid = PdfGrid();
+    grid.columns.add(count: 5);
+    final headRow = grid.headers.add(1)[0];
+    headRow.style.backgroundBrush = PdfSolidBrush(PdfColor(68, 114, 196));
+    headRow.style.textBrush = PdfBrushes.white;
+    headRow.cells[0].value = 'Product ID';
+    headRow.cells[1].value = 'Name';
+    headRow.cells[2].value = 'Price';
+    headRow.cells[3].value = 'Quantity';
+    headRow.cells[4].value = 'Amount';
+    headRow.style.font =
+        PdfStandardFont(PdfFontFamily.helvetica, 10, style: PdfFontStyle.bold);
+    late List<dynamic> listx = [];
+    final row0 = grid.rows.add();
+    row0.cells[0].value = '111';
+
+    //    var x = Main_Cubit.get(context).getItems_all();
+    //   for (var i = 0; i < items_model!.data_items.length; i++) {
+    //     final row = grid.rows.add();
+    // print('*******369**********');
+    // print(items_model!.data_items[i].code);
+    // row.cells[0].value =getItems_all.;
+    // }
+    //=============================
+    // for (var i = 0; i < 3; i++) {
+    //   final row = grid.rows.add();
+    //   row.cells[0].value = '1010';
+    // }
+    // DioHelper.getData(
+    //   url: 'http://178.128.146.68/getAllItemsCardPostman?companyCode=${dbno}',
+    // ).then((value) {
+    //   Items_Model? items_model;
+    //   items_model = Items_Model.fromJson(value.data);
+    //   for (var i = 0; i < items_model.data_items.length; i++) {
+    //     // for (var i = 0; i < 2; i++) {
+    //     final row = grid.rows.add();
+    //     row.cells[0].value = '1010';
+    //     print('*******333**********');
+    //     print(items_model.data_items.length);
+    //     print(items_model.data_items[i].code);
+    //     listx.addAll([items_model.data_items[i].code]);
+
+    //     print('*/*/*/*/*/*/*/*/');
+    //     print(listx.length);
+    //     print(listx.toList());
+    //     for (var i = 0; i < listx.length; i++) {
+    //       final row1 = grid.rows.add();
+    //       row1.cells[0].value = '444';
+
+    //       // row.cells[0].value = listx[i];
+    //       print('sasassaasssssssssssssssssssssssssss');
+    //       print(listx[i]);
+    //     }
+    //     // print(items_model.data_items[i].name1);
+    //     // print(items_model.data_items[i].price);
+
+    //     // row.cells[0].value = items_model.data_items[i].code;
+    //     // row.cells[1].value = items_model.data_items[i].name1.toString();
+    //     // row.cells[2].value = items_model.data_items[i].name2.toString();
+    //     // row.cells[3].value = items_model.data_items[i].price.toString();
+    //   }
+    // });
+    // print();
+
+    // print(Main_Cubit.get(context).lsx.length);
+
+    // print(Main_Cubit.get(context).lsx);
+
+    final row3 = grid.rows.add();
+    row3.cells[0].value = 'out';
+    for (var i = 0; i < 2; i++) {
+      print(listx.length);
+      final row1 = grid.rows.add();
+      row1.cells[0].value = listprod[i];
+      print(listprod[i]);
+    }
+
+    //===============================
+
+    // Order.products.where((products) => products.qun > 0).forEach((products){
+
+    //     final row = grid.rows.add();
+    //     row.cells[0].value = Product.fromJson(json).id;
+    // });
+
+    // Items_Model.where((Items_Model) => Items_Model.qun > 0).forEach((Items_Model){});
+
+    // List listx = ["1", "NAME", "6", "10", "60", "00"];
+
+    // for (var i = 0; i < listx.length; i++) {
+    // // for (var i = 0; i < Main_Cubit.get(context).items_model?.data_items; i++) {
+    //   final row = grid.rows.add();
+    //   row.cells[0].value = listx[0];
+    //   row.cells[1].value = listx[1];
+    //   row.cells[2].value = listx[2];
+    //   row.cells[3].value = listx[3];
+    //   row.cells[4].value = listx[4];
+    // }
+
+    grid.draw(page: page, bounds: Rect.fromLTWH(0, 40, 0, 0))!;
+
+//=================================================
+    //add table
+    // PdfGrid grid = PdfGrid();
+    // grid.style = PdfGridStyle(
+    //     font: PdfStandardFont(PdfFontFamily.helvetica, 30),
+    //     cellPadding: PdfPaddings(left: 5, right: 2, top: 2, bottom: 2));
+
+    // grid.columns.add(count: 3);
+    // grid.headers.add(1);
+
+    // PdfGridRow header = grid.headers[0];
+    // header.cells[0].value = 'Roll No';
+    // header.cells[1].value = 'Name';
+    // header.cells[2].value = 'Class';
+
+    // PdfGridRow row = grid.rows.add();
+    // row.cells[0].value = '1';
+    // row.cells[1].value = 'Arya';
+    // row.cells[2].value = '6';
+
+    // row = grid.rows.add();
+    // row.cells[0].value = '2';
+    // row.cells[1].value = 'John';
+    // row.cells[2].value = '9';
+
+    // row = grid.rows.add();
+    // row.cells[0].value = '3';
+    // row.cells[1].value = 'Tony';
+    // row.cells[2].value = '8';
+
+    //  grid.draw(
+    //  page: document.pages.add(), bounds: const Rect.fromLTWH(0, 0, 0, 0));
+//=================================================
+  }
+}
